@@ -2,8 +2,8 @@
 Contributors: Amin Shah
 Tags: whatsapp, whatsapp business, telegram, telegram chat, whatsapp chat, pulsating button
 Requires at least: 3.0
-Tested up to: 6.8.2
-Stable tag: 1.5.3
+Tested up to: 6.9
+Stable tag: 1.5.8
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://t.me/aminsha/
@@ -75,7 +75,7 @@ Yes, the plugin is regularly updated to stay compatible with the latest advancem
 
 == Changelog ==
 
-= 1.5.0 =
+= 1.5.6 =
 * Direct links for the button have been added.
 
 = 1.4.1 =

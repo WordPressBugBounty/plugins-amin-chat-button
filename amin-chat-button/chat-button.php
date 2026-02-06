@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Pulsating Chat Button
  * Description: WhatsApp Chat🔥. Adds a pulsating WhatsApp or Telegram button 🍀 to your website. Fast and easy installation. Setting up target id GTM and YandexMetrics. Setting pre-filled Message.
- * Version: 1.5.3
+ * Version: 1.5.8
  * Text Domain: amin-chat-button
  * License: GPLv2 or later
  * Author: Amin Shah
@@ -173,10 +173,8 @@ function amin_chat_button_settings_page() {
                 : ''
         );
         update_option(
-            'amin_chat_button_plugin_puls', 
-            isset($_POST['amin_chat_button_plugin_puls']) 
-                ? sanitize_text_field(wp_unslash($_POST['amin_chat_button_plugin_puls'])) 
-                : ''
+            'amin_chat_button_plugin_pulsation', 
+            isset($_POST['amin_chat_button_plugin_pulsation']) ? '1' : '0'
         );
     }
 
@@ -202,8 +200,7 @@ function amin_chat_button_settings_page() {
     $yametrik_id = get_option('amin_chat_button_plugin_yametrik_id', '');
     $yametrik_account = get_option('amin_chat_button_plugin_yametrik_account', '');
     $prohibited_urls = get_option('amin_chat_button_plugin_prohibited_urls', '');
-    $puls = get_option('amin_chat_button_plugin_puls', 'puls');
-    
+    $pulsation = get_option('amin_chat_button_plugin_pulsation', '1');
 
     // Display the settings form
     ?>
@@ -228,6 +225,15 @@ function amin_chat_button_settings_page() {
                             <option value="WhatsApp" <?php selected($msg_select, 'WhatsApp'); ?>><?php echo esc_html__('WhatsApp', 'amin-chat-button'); ?></option>
                             <option value="Telegram" <?php selected($msg_select, 'Telegram'); ?>><?php echo esc_html__('Telegram', 'amin-chat-button'); ?></option>
                         </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php echo esc_html__('Enable Pulsation', 'amin-chat-button'); ?></th>
+                    <td>
+                        <label for="amin_chat_button_plugin_pulsation">
+                            <input type="checkbox" id="amin_chat_button_plugin_pulsation" name="amin_chat_button_plugin_pulsation" value="1" <?php checked($pulsation, '1'); ?>>
+                            <?php echo esc_html__('Enable pulsating animation for the button', 'amin-chat-button'); ?>
+                        </label>
                     </td>
                 </tr>
                 <tr>
@@ -334,15 +340,6 @@ function amin_chat_button_settings_page() {
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row"><?php echo esc_html__('Pulsation', 'amin-chat-button'); ?></th>
-                    <td>
-                        <select id="amin_chat_button_plugin_puls" name="amin_chat_button_plugin_puls">
-                            <option value="puls" <?php selected($puls, 'puls'); ?>><?php echo esc_html__('Pulsation on', 'amin-chat-button'); ?></option>
-                            <option value="puls_no" <?php selected($puls, 'puls_no'); ?>><?php echo esc_html__('Pulsation off', 'amin-chat-button'); ?></option>                            
-                        </select>
-                    </td>
-                </tr>
-                <tr>
                     <th scope="row"><?php echo esc_html__('YandexMetrika Account ID', 'amin-chat-button'); ?></th>
                     <td>                
                         <input type="text" id="amin_chat_button_plugin_yametrik_account" name="amin_chat_button_plugin_yametrik_account" value="<?php echo esc_attr($yametrik_account); ?>">
@@ -409,6 +406,7 @@ function amin_chat_button_plugin_add_button() {
         'yametrik_id'        => get_option('amin_chat_button_plugin_yametrik_id', ''),
         'yametrik_account'   => get_option('amin_chat_button_plugin_yametrik_account', ''),
         'prohibited_urls'    => get_option('amin_chat_button_plugin_prohibited_urls', ''),
+        'pulsation'          => get_option('amin_chat_button_plugin_pulsation', '1'),
         'phone'              => get_option('amin_chat_button_plugin_phone', ''),
         'phone_en'           => get_option('amin_chat_button_plugin_phone_en', ''),
         'phone_tr'           => get_option('amin_chat_button_plugin_phone_tr', ''),
@@ -418,7 +416,6 @@ function amin_chat_button_plugin_add_button() {
         'link'               => get_option('amin_chat_button_plugin_phone_link', ''),
         'link_en'            => get_option('amin_chat_button_plugin_phone_link_en', ''),
         'link_tr'            => get_option('amin_chat_button_plugin_phone_link_tr', ''),
-        'puls'               => get_option('amin_chat_button_plugin_puls', ''),
     );
 
     // Определение URL
@@ -475,6 +472,11 @@ function amin_chat_button_plugin_add_button() {
             'href' => [],
             'title' => [],
         ],
+        'div' => [
+            'type' => [],
+            'style' => [],
+            'class' => [],
+        ],
         'br' => [],
         'em' => [],
         'strong' => [],
@@ -488,18 +490,13 @@ function amin_chat_button_plugin_add_button() {
     ];
 
     // HTML кнопки
-    $class_string = trim($button_class . ' ' . $options['position']);
-    if ($options['puls'] === 'puls') {
-        $class_string .= ' puls';
-    }
-
     echo '<a href="' . esc_url($link) . '" 
               target="_blank" 
               rel="noopener noreferrer nofollow" 
               onclick="safeYm(\'' . esc_attr($options['yametrik_account']) . '\',\'reachGoal\', \'' . esc_attr($options['yametrik_id']) . '\'), gtag(\'' . esc_attr($options['tag_select']) . '\', \'' . esc_attr($options['target_id']) . '\')' . 
               (!empty($options['gtag_report']) ? ', gtag_report_conversion()' : '') . '" 
               id="' . esc_attr($button_id) . '" 
-              class="' . esc_attr($class_string) . '">
+              class="' . esc_attr($button_class . ' ' . $options['position'] . ($options['pulsation'] === '1' && $options['msg_select'] === 'WhatsApp' ? ' puls' : '') . ($options['pulsation'] !== '1' ? ' no-pulsation' : '')) . '">
             <div type="button" style="background-color: #ffffff00;padding: 0;">
                 <div class="cbp-text-button">
                     ' . wp_kses('<img src="'. esc_attr($icon_src) .'">', $allowed_tags, $allowed_protocols) . '
@@ -514,14 +511,14 @@ function amin_chat_button_plugin_add_button() {
 // Enqueue styles and scripts
 function amin_chat_button_plugin_enqueue_scripts() {
     // Подключение стилей
-    wp_enqueue_style('amin-chat-button-style', plugin_dir_url(__FILE__) . 'style.css', [], '2.0');
+    wp_enqueue_style('amin-chat-button-style', plugin_dir_url(__FILE__) . 'style.css', [], '1.9');
 
     // Регистрация и подключение скрипта
     wp_register_script(
         'amin-chat-button-safeym-script',
         '',
         [],
-        '1.1', // Версия скрипта для предотвращения кэширования
+        '1.0', // Версия скрипта для предотвращения кэширования
         true   // Загружать скрипт в нижнем колонтитуле
     );
     wp_enqueue_script('amin-chat-button-safeym-script');

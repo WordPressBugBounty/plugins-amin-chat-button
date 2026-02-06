@@ -4,9 +4,7 @@
     border-radius: 50%;
     box-shadow: 0 8px 10px rgba(7, 206, 112, 0.6);
     cursor: pointer;
-    height: 68px; 
     text-align: center;
-    width: 68px;
     position: fixed;
     z-index: 9999;
     transition: .3s;
@@ -22,9 +20,7 @@
     border-radius: 50%;
     box-shadow: 0 8px 10px rgb(7 149 206 / 60%);
     cursor: pointer;
-    height: 68px; 
     text-align: center;
-    width: 68px;
     position: fixed;
     z-index: 9999;
     transition: .3s;
@@ -42,11 +38,14 @@
 }
 
 .cbp-whatsapp-button .cbp-text-button, .cbp-tg-button .cbp-text-button {
-    height:68px;
-    width:68px;
+    height:60px;
+    width:60px;
     border-radius:50%;
     position:relative;
     overflow:hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .cbp-whatsapp-button .cbp-text-button span {
     text-align: center;
@@ -54,8 +53,8 @@
     opacity: 0;
     font-size: 0;
     position:absolute;
-    right: 10px;
-    top: 25px;
+    right: auto;
+    top: auto;
     line-height: 14px;
     font-weight: 600;
     transition: opacity .3s linear;
@@ -67,8 +66,8 @@
     opacity: 0;
     font-size: 0;
     position:absolute;
-    right: 12px;
-    top: 25px;
+    right: auto;
+    top: auto;
     line-height: 14px;
     font-weight: 600;
     transition: opacity .3s linear;
@@ -90,8 +89,7 @@
 
 .cbp-whatsapp-button img {
     width: 40px;
-    margin-left: -4px; 
-    margin-top: 8px; 
+    margin: 0;
     filter: brightness(0) invert(1);
     color:#fff;
     font-size:44px;
@@ -101,13 +99,12 @@
     animation-iteration-count: infinite;
     -webkit-animation: 1200ms ease 0s normal none 1 running amin;
     -webkit-animation-iteration-count: infinite;
-    display: initial;
+    display: block;
         
 }
 .cbp-tg-button img {
     width: 47px;
-    margin-left: -5px; 
-    margin-top: 8px; 
+    margin: 0;
     filter: brightness(0) invert(1);
     color:#fff;
     font-size:44px;
@@ -117,7 +114,7 @@
     animation-iteration-count: infinite;
     -webkit-animation: 1200ms ease 0s normal none 1 running amin;
     -webkit-animation-iteration-count: infinite;
-    display: initial;
+    display: block;
         
 }
 @-webkit-keyframes hoverWave {
@@ -300,4 +297,11 @@ a#cbp-whatsapp-button {
 }
 a#cbp-tg-button {
     background: #25a5d3;
+}
+a#cbp-tg-button.no-pulsation,
+a#cbp-whatsapp-button.no-pulsation,
+.cbp-tg-button.no-pulsation,
+.cbp-whatsapp-button.no-pulsation {
+    -webkit-animation: none !important;
+    animation: none !important;
 }
