@@ -1,13 +1,23 @@
 <?php
 /**
  * Plugin Name: Pulsating Chat Button
+ * Plugin URI: https://wordpress.org/plugins/amin-chat-button/
  * Description: WhatsApp Chat🔥. Adds a pulsating WhatsApp or Telegram button 🍀 to your website. Fast and easy installation. Setting up target id GTM and YandexMetrics. Setting pre-filled Message.
- * Version: 1.5.8
+ * Version: 1.5.10
+ * Requires at least: 5.6
+ * Requires PHP: 7.0
  * Text Domain: amin-chat-button
  * License: GPLv2 or later
+ * License URI: https://t.me/aminsha/
  * Author: Amin Shah
  * Author URI: https://t.me/aminsha
  */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+define('AMIN_CHAT_BUTTON_VERSION', '1.5.10');
 
 // Add a menu item in the WordPress admin panel
 function amin_chat_button_plugin_menu() {
@@ -33,7 +43,7 @@ function amin_chat_button_settings_page() {
 
         $nonce = isset($_POST['amin_chat_button_nonce']) ? sanitize_text_field(wp_unslash($_POST['amin_chat_button_nonce'])) : '';
 
-        // Проверка nonce
+        // Nonce check
         if (!wp_verify_nonce($nonce, 'amin_chat_button_save_settings')) {
             wp_die(esc_html__('Security check failed. Settings not saved.', 'amin-chat-button'));
         }
@@ -256,7 +266,7 @@ function amin_chat_button_settings_page() {
                     <tr>
                         <th scope="row"><?php echo esc_html__('First message text. Default', 'amin-chat-button'); ?></th>
                         <td>
-                            <textarea id="amin_chat_button_plugin_text" name="amin_chat_button_plugin_text" rows="3" cols="40"><?php echo esc_attr($text); ?></textarea>
+                            <textarea id="amin_chat_button_plugin_text" name="amin_chat_button_plugin_text" rows="3" cols="40"><?php echo esc_textarea($text); ?></textarea>
                             <p class="cbp-description"><?php echo esc_html__('Enter your default language message text only for Whatsapp.', 'amin-chat-button'); ?></p>
                         </td>
                     </tr>
@@ -265,7 +275,7 @@ function amin_chat_button_settings_page() {
                         <td>
                             <input type="text" id="amin_chat_button_plugin_text_en_loc" name="amin_chat_button_plugin_text_en_loc" value="<?php echo esc_attr($text_en_loc); ?>" oninput="this.value = this.value.toLowerCase()">
                             <p class="cbp-description"><?php echo esc_html__('Localization code, for example "en"', 'amin-chat-button'); ?></p><br>
-                            <textarea id="amin_chat_button_plugin_text_en" name="amin_chat_button_plugin_text_en" rows="3" cols="40"><?php echo esc_attr($text_en); ?></textarea>
+                            <textarea id="amin_chat_button_plugin_text_en" name="amin_chat_button_plugin_text_en" rows="3" cols="40"><?php echo esc_textarea($text_en); ?></textarea>
                             <p class="cbp-description"><?php echo esc_html__('Enter your message text only for Whatsapp.', 'amin-chat-button'); ?></p></br>
                             <input type="text" id="amin_chat_button_plugin_phone_en" name="amin_chat_button_plugin_phone_en" value="<?php echo esc_attr($phone_en); ?>">
                             <p class="cbp-description"><?php echo esc_html__('Substitute another phone number in international format without the "+" sign.', 'amin-chat-button'); ?></p>
@@ -276,7 +286,7 @@ function amin_chat_button_settings_page() {
                         <td>
                             <input type="text" id="amin_chat_button_plugin_text_tr_loc" name="amin_chat_button_plugin_text_tr_loc" value="<?php echo esc_attr($text_tr_loc); ?>" oninput="this.value = this.value.toLowerCase()">
                             <p class="cbp-description"><?php echo esc_html__('Localization code, for example "tr"', 'amin-chat-button'); ?></p><br>
-                            <textarea id="amin_chat_button_plugin_text_tr" name="amin_chat_button_plugin_text_tr" rows="3" cols="40"><?php echo esc_attr($text_tr); ?></textarea>
+                            <textarea id="amin_chat_button_plugin_text_tr" name="amin_chat_button_plugin_text_tr" rows="3" cols="40"><?php echo esc_textarea($text_tr); ?></textarea>
                             <p class="cbp-description"><?php echo esc_html__('Enter your message text only for Whatsapp.', 'amin-chat-button'); ?></p></br>
                             <input type="text" id="amin_chat_button_plugin_phone_tr" name="amin_chat_button_plugin_phone_tr" value="<?php echo esc_attr($phone_tr); ?>">
                             <p class="cbp-description"><?php echo esc_html__('Substitute another phone number in international format without the "+" sign.', 'amin-chat-button'); ?></p>
@@ -310,26 +320,6 @@ function amin_chat_button_settings_page() {
                         </td>
                     </tr>
                 </tbody>
-                <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const checkbox = document.getElementById('amin_chat_button_plugin_enabled_together');
-                    const separateFields = document.getElementById('amin_chat_button_plugin_fields_block');
-                    const togetherFields = document.getElementById('amin_chat_button_plugin_fields_together');
-
-                    function toggleFields() {
-                        if (checkbox.checked) {
-                            separateFields.style.display = 'none';
-                            togetherFields.style.display = '';
-                        } else {
-                            separateFields.style.display = '';
-                            togetherFields.style.display = 'none';
-                        }
-                    }
-
-                    checkbox.addEventListener('change', toggleFields);
-                    toggleFields(); // запускаем сразу, если чекбокс уже включён
-                });
-                </script>
                 <tr>
                     <th scope="row"><?php echo esc_html__('Button Position', 'amin-chat-button'); ?></th>
                     <td>
@@ -393,6 +383,20 @@ function amin_chat_button_settings_page() {
     <?php
 }
 
+/**
+ * Escape a value for use inside a single quoted JavaScript string literal.
+ *
+ * The HTML layer is handled by esc_attr() on the finished onclick attribute,
+ * so this deliberately does not encode HTML entities the way esc_js() does:
+ * doing both would turn "&" into "&amp;" inside the JavaScript string.
+ *
+ * @param string $value Raw option value.
+ * @return string Value safe to place between single quotes in JavaScript.
+ */
+function amin_chat_button_js_string($value) {
+    return addslashes(str_replace(array("\r", "\n"), '', (string) $value));
+}
+
 function amin_chat_button_plugin_add_button() {
     if (get_option('amin_chat_button_plugin_enabled', '0') !== '1') return;
 
@@ -418,19 +422,17 @@ function amin_chat_button_plugin_add_button() {
         'link_tr'            => get_option('amin_chat_button_plugin_phone_link_tr', ''),
     );
 
-    // Определение URL
-    $current_url = (isset($_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']))
-        ? 'https://' . sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'])) . sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI']))
-        : '';
+    // Current URL, built by core instead of raw $_SERVER input
+    $current_url = home_url(add_query_arg(array(), null));
 
-    // Блокировка на запрещённых URL
+    // Do not display the button on prohibited URLs
     if ($current_url && !empty($options['prohibited_urls'])) {
         foreach (array_map('trim', explode(',', $options['prohibited_urls'])) as $prohibited_url) {
             if (stripos($current_url, $prohibited_url) !== false) return;
         }
     }
 
-    // Локализация
+    // Localization
     $locale = (preg_match('/\/([a-z]{2})(\/|$)/i', $current_url, $m)) ? strtolower($m[1]) : '';
     $phone  = $options['phone'];
     $text   = $options['text'];
@@ -448,14 +450,14 @@ function amin_chat_button_plugin_add_button() {
 
     if (empty($phone)) return;
 
-    // Автогенерация ссылки, если не задана вручную
+    // Build the link automatically unless it was entered manually
     if ($options['enabled_together'] !== '1') {
         $link = ($options['msg_select'] === 'Telegram')
             ? 'https://t.me/+' . rawurlencode($phone)  . '?text=' . rawurlencode($text)
             : 'https://api.whatsapp.com/send?phone=' . rawurlencode($phone) . '&text=' . rawurlencode($text);
     }
 
-    // Подготовка атрибутов кнопки
+    // Button attributes
     $button_id    = ($options['msg_select'] === 'Telegram') ? 'cbp-tg-button' : 'cbp-whatsapp-button';
     $button_class = ($options['msg_select'] === 'Telegram') ? 'cbp-tg-button' : 'cbp-whatsapp-button';
     $button_text = ($options['msg_select'] === 'Telegram') ? 'Telegram' : 'WhatsApp';
@@ -489,14 +491,37 @@ function amin_chat_button_plugin_add_button() {
         'data',
     ];
 
-    // HTML кнопки
-    echo '<a href="' . esc_url($link) . '" 
-              target="_blank" 
-              rel="noopener noreferrer nofollow" 
-              onclick="safeYm(\'' . esc_attr($options['yametrik_account']) . '\',\'reachGoal\', \'' . esc_attr($options['yametrik_id']) . '\'), gtag(\'' . esc_attr($options['tag_select']) . '\', \'' . esc_attr($options['target_id']) . '\')' . 
-              (!empty($options['gtag_report']) ? ', gtag_report_conversion()' : '') . '" 
-              id="' . esc_attr($button_id) . '" 
-              class="' . esc_attr($button_class . ' ' . $options['position'] . ($options['pulsation'] === '1' && $options['msg_select'] === 'WhatsApp' ? ' puls' : '') . ($options['pulsation'] !== '1' ? ' no-pulsation' : '')) . '">
+    // Button classes. The Telegram button animates through its own base class,
+    // the WhatsApp button only through "puls"; "no-pulsation" switches both off.
+    $classes = [$button_class, $options['position']];
+    if ($options['pulsation'] === '1') {
+        if ($options['msg_select'] === 'WhatsApp') {
+            $classes[] = 'puls';
+        }
+    } else {
+        $classes[] = 'no-pulsation';
+    }
+
+    // Analytics calls go through the safe* helpers so a missing or blocked
+    // analytics library cannot break the click handler.
+    $onclick = sprintf(
+        "safeYm('%s','reachGoal','%s'), safeGtag('%s','%s')",
+        amin_chat_button_js_string($options['yametrik_account']),
+        amin_chat_button_js_string($options['yametrik_id']),
+        amin_chat_button_js_string($options['tag_select']),
+        amin_chat_button_js_string($options['target_id'])
+    );
+    if (!empty($options['gtag_report'])) {
+        $onclick .= ', safeGtagReport()';
+    }
+
+    // Button HTML
+    echo '<a href="' . esc_url($link) . '"
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              onclick="' . esc_attr($onclick) . '"
+              id="' . esc_attr($button_id) . '"
+              class="' . esc_attr(implode(' ', $classes)) . '">
             <div type="button" style="background-color: #ffffff00;padding: 0;">
                 <div class="cbp-text-button">
                     ' . wp_kses('<img src="'. esc_attr($icon_src) .'">', $allowed_tags, $allowed_protocols) . '
@@ -510,35 +535,47 @@ function amin_chat_button_plugin_add_button() {
 
 // Enqueue styles and scripts
 function amin_chat_button_plugin_enqueue_scripts() {
-    // Подключение стилей
-    wp_enqueue_style('amin-chat-button-style', plugin_dir_url(__FILE__) . 'style.css', [], '1.9');
+    // Front-end styles
+    wp_enqueue_style(
+        'amin-chat-button-style',
+        plugin_dir_url(__FILE__) . 'style.css',
+        [],
+        AMIN_CHAT_BUTTON_VERSION
+    );
 
-    // Регистрация и подключение скрипта
+    // Carrier handle for the inline analytics helpers (no source file of its own)
     wp_register_script(
         'amin-chat-button-safeym-script',
-        '',
+        false,
         [],
-        '1.0', // Версия скрипта для предотвращения кэширования
-        true   // Загружать скрипт в нижнем колонтитуле
+        AMIN_CHAT_BUTTON_VERSION,
+        true // load in the footer
     );
     wp_enqueue_script('amin-chat-button-safeym-script');
 
-    // Добавление inline-скрипта
     wp_add_inline_script(
         'amin-chat-button-safeym-script',
         "function safeYm(metrikaId, goalName, addit) {
-            if (typeof ym === 'function' && Boolean(metrikaId)) {    
+            if (typeof ym === 'function' && Boolean(metrikaId)) {
                 ym(metrikaId, goalName, addit);
             } else {
                 console.error('Yandex.Metrika haven\\'t loaded or blocked');
             }
             return false;
         }
-        function safeGtag(event, targetId, addit, callback) {
-            if (typeof gtag === 'function' && Boolean(targetId)) {    
-                gtag(event, targetId, addit, callback);
+        function safeGtag(event, targetId) {
+            if (typeof gtag === 'function' && Boolean(targetId)) {
+                gtag.apply(null, arguments);
             } else {
                 console.error('Gtag haven\\'t loaded or blocked');
+            }
+            return false;
+        }
+        function safeGtagReport() {
+            if (typeof gtag_report_conversion === 'function') {
+                gtag_report_conversion();
+            } else {
+                console.error('gtag_report_conversion is not defined');
             }
             return false;
         }",
@@ -547,20 +584,59 @@ function amin_chat_button_plugin_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'amin_chat_button_plugin_enqueue_scripts');
 
-function amin_chat_button_enqueue_custom_admin_style() {
-        wp_enqueue_style('amin-chat-button-admin', plugin_dir_url(__FILE__) . 'admin.css',[],'2.0');
+// Admin assets, loaded on the plugin settings screen only
+function amin_chat_button_enqueue_custom_admin_style($hook_suffix) {
+    if ('toplevel_page_amin-chat-button-settings' !== $hook_suffix) {
+        return;
+    }
+
+    wp_enqueue_style(
+        'amin-chat-button-admin',
+        plugin_dir_url(__FILE__) . 'admin.css',
+        [],
+        AMIN_CHAT_BUTTON_VERSION
+    );
+
+    wp_register_script(
+        'amin-chat-button-admin',
+        false,
+        [],
+        AMIN_CHAT_BUTTON_VERSION,
+        true
+    );
+    wp_enqueue_script('amin-chat-button-admin');
+
+    // Toggle between the separate phone/message fields and the direct-link fields
+    wp_add_inline_script(
+        'amin-chat-button-admin',
+        "document.addEventListener('DOMContentLoaded', function () {
+            var checkbox = document.getElementById('amin_chat_button_plugin_enabled_together');
+            var separateFields = document.getElementById('amin_chat_button_plugin_fields_block');
+            var togetherFields = document.getElementById('amin_chat_button_plugin_fields_together');
+
+            if (!checkbox || !separateFields || !togetherFields) {
+                return;
+            }
+
+            function toggleFields() {
+                separateFields.style.display = checkbox.checked ? 'none' : '';
+                togetherFields.style.display = checkbox.checked ? '' : 'none';
+            }
+
+            checkbox.addEventListener('change', toggleFields);
+            toggleFields(); // apply immediately if the checkbox is already on
+        });"
+    );
 }
-add_action( 'admin_enqueue_scripts', 'amin_chat_button_enqueue_custom_admin_style' );
+add_action('admin_enqueue_scripts', 'amin_chat_button_enqueue_custom_admin_style');
 
 // Add settings link on plugin page
 function amin_chat_button_plugin_settings_link($links) {
-    $settings_link = '<a href="options-general.php?page=amin-chat-button">' . esc_html__('Settings', 'amin-chat-button') . '</a>';
+    $settings_link = '<a href="' . esc_url(admin_url('admin.php?page=amin-chat-button-settings')) . '">' . esc_html__('Settings', 'amin-chat-button') . '</a>';
     array_unshift($links, $settings_link);
     return $links;
 }
-
-$plugin_basename = plugin_basename(__FILE__);
-add_filter('cbp_plugin_action_links_' . $plugin_basename, 'amin_chat_button_plugin_settings_link');
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'amin_chat_button_plugin_settings_link');
 
 
 // Display the WhatsApp button on the website

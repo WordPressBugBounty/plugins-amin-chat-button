@@ -1,14 +1,14 @@
 === Pulsating Chat Button ===
 Contributors: Amin Shah
-Tags: whatsapp, whatsapp business, telegram, telegram chat, whatsapp chat, pulsating button
-Requires at least: 3.0
-Tested up to: 6.9
-Stable tag: 1.5.8
+Tags: whatsapp, telegram, whatsapp chat, telegram chat, chat button
+Requires at least: 5.6
+Tested up to: 7.1
+Stable tag: 1.5.10
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://t.me/aminsha/
 
-WhatsApp or Telegram Chat🔥. Adds a pulsating WhatsApp or Telegram button 🍀 to your website. Fast and easy installation. Setting up target id GTM and YandexMetrics. Setting pre-filled Message.
+Adds a pulsating WhatsApp or Telegram chat button to your site. Pre-filled message, Google Tag and Yandex.Metrica goals.
 
 == Description ==
 
@@ -68,12 +68,36 @@ Absolutely! The plugin features a user-friendly interface and intuitive settings
 = Can I expect regular updates and support for the plugin? =
 Yes, the plugin is regularly updated to stay compatible with the latest advancements, and reliable support is available to assist you with any queries or issues you may encounter.
 
-== Screenshots ==
+== Upgrade Notice ==
 
-1. Описание к первому изображению
-2. Описание ко второму изображению
+= 1.5.10 =
+Resolves the issues reported by Plugin Check: output escaping on the button click handler, the Domain Path header and the length of the short description.
+
+= 1.5.9 =
+Compatibility with WordPress 7.1. Fixes the "Settings" link on the Plugins page, prevents a JavaScript error on click when Google Analytics is missing or blocked, and stops the plugin admin styles from affecting other admin screens.
 
 == Changelog ==
+
+= 1.5.10 =
+* The button click handler is now escaped with esc_attr on output, resolving the Plugin Check escaping error.
+* Removed the Domain Path header, as the plugin ships no languages folder.
+* Shortened the readme short description to the supported 150 characters.
+
+= 1.5.9 =
+* Declared compatibility with WordPress 7.1.
+* Fixed the "Settings" link on the Plugins page: it used a non-existent hook and pointed at the wrong page.
+* Analytics calls on click now go through the safeGtag helper, so a missing or blocked gtag no longer throws a JavaScript error and interrupts the handler.
+* Admin styles are now loaded only on the plugin settings screen and scoped to the plugin table, instead of restyling every table in the WordPress admin.
+* Message fields are escaped with esc_textarea, so line breaks and quotes in saved messages are preserved.
+* The current URL is now built with home_url() instead of raw $_SERVER input.
+* Analytics IDs are escaped with esc_js in the click handler, so a quote in a target ID can no longer break the generated JavaScript.
+* Added the ABSPATH guard, the missing plugin headers and a single version constant.
+
+= 1.5.8 =
+* Pulsation is now controlled by a checkbox in the settings and can be turned off.
+
+= 1.5.7 =
+* Minor fixes.
 
 = 1.5.6 =
 * Direct links for the button have been added.

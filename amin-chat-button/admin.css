@@ -2,18 +2,20 @@ table.cbp-form-table th {
     vertical-align: top !important;
 }
 
-tr td, th {
-    border-bottom: 1px solid #cdcdcd; 
-    padding-top: 20px; 
+table.cbp-form-table tr td,
+table.cbp-form-table th {
+    border-bottom: 1px solid #cdcdcd;
+    padding-top: 20px;
     padding-bottom: 20px;
 }
 
-tr, th {
+table.cbp-form-table tr,
+table.cbp-form-table th {
     border-collapse: separate;
-    border-spacing: 0 10px; /* Расстояние между строками */
+    border-spacing: 0 10px; /* spacing between rows */
 }
 
-th {
+table.cbp-form-table th {
     padding-top: 20px;
     padding-right: 20px;
     text-align: left;
